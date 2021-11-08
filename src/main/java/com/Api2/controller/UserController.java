@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Api2.Entity.Users;
+import com.Api2.model.UserRequest;
 import com.Api2.model.UserResponse;
 import com.Api2.service.UserService;
 
@@ -23,33 +24,8 @@ import com.Api2.service.UserService;
 
 public class UserController {
 
-//	
 	@Autowired
 	private UserService service;
-//	
-//	@GetMapping("/users")
-//	public List<Users>getUsers()
-//	{
-//		
-//		return service.getUsers();
-//		
-//	}
-
-//	@GetMapping("/users")
-//	public Users getUsers(@RequestBody Users user)throws Exception {
-//		
-//		String tempEmail=user.getEmail();
-//		if(tempEmail!=null && ! "".equals(tempEmail)) {
-//			Users userobj=service.fetchUserByEmail(tempEmail);
-//			if(userobj!=null) {
-//				throw new Exception("Use with" +tempEmail+ " is already exist");
-//			}
-//		}
-//		Users userobj=null;
-//		userobj=service.saveUser(user);
-//		return userobj;
-//	
-//		}
 
 	@GetMapping("/users")
 	public ResponseEntity<List<Users>> getUsers() {
@@ -57,12 +33,6 @@ public class UserController {
 		List<Users> user = service.getUsers();
 		return new ResponseEntity<List<Users>>(user, HttpStatus.OK);
 	}
-//	
-//	@GetMapping("/users/{id}")
-//	public Users getUsers(@PathVariable Long id){
-//		return service.getSingleUser(id);
-//		
-//	}
 
 	@GetMapping("users/{id}")
 	public ResponseEntity<Users> getUser(@PathVariable Long id) {
@@ -70,33 +40,37 @@ public class UserController {
 		return new ResponseEntity<Users>(user, HttpStatus.OK);
 	}
 
-//	@PostMapping("/users")
-//	public Users saveUsers(@RequestBody Users user)
-//	{
-//		return service.saveUser(user);
-//	}
 	@PostMapping("/users")
-	public ResponseEntity<Users> save(@RequestBody Users user) {
-		Users b = service.saveUser(user);
+	public ResponseEntity<Users> save(@RequestBody UserRequest req) {
+		Users b = service.saveUser(this.requestToUserForSave(req));
 		return new ResponseEntity<Users>(b, HttpStatus.OK);
 	}
 
-//	@PutMapping("/users/{id}")
-//	public Users updateUsers(@PathVariable Long id,@RequestBody Users user) {
-//		user.setId(id);
-//		return service.updateUser(user);
-//	}
-//	
-	@PutMapping("/users/update")
-	public ResponseEntity<UserResponse> update(@RequestBody Users user) {
+	private Users requestToUserForSave(UserRequest req) {
+		Users user = new Users();
+		user.setName(req.getRname());
+		user.setDob(req.getRdob());
+		user.setEmail(req.getRemail());
+		user.setMobno(req.getRmobno());
+		return user;
 
-		return new ResponseEntity<UserResponse>(service.updateUser(user), HttpStatus.OK);
 	}
 
-//@DeleteMapping("/users")
-//public void deleteUser(@RequestParam Long id) {
-//	service.deleteUser(id);
-//}
+	@PutMapping("/users/update")
+	public ResponseEntity<UserResponse> update(@RequestBody UserRequest req) {
+
+		return new ResponseEntity<UserResponse>(service.updateUser(this.requestToUser(req)), HttpStatus.OK);
+	}
+
+	private Users requestToUser(UserRequest req) {
+		Users user = new Users();
+		user.setId(req.getRid());
+		user.setName(req.getRname());
+		user.setDob(req.getRdob());
+		user.setEmail(req.getRemail());
+		user.setMobno(req.getRmobno());
+		return user;
+	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
