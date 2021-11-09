@@ -8,11 +8,11 @@ import com.Api2.model.UserResponse;
 public interface UserService {
 	List<Users> getUsers();
 
-	Users saveUser(Users user);
+	UserResponse saveUser(Users user);
 	
-	Users getSingleUser (Long id);
+	UserResponse getSingleUser (Long id);
 	
-	void deleteUser(Long id);
+	UserResponse deleteUser(Long id);
 	
 	UserResponse updateUser(Users user);
 

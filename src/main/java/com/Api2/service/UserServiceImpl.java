@@ -12,15 +12,12 @@ import com.Api2.exception.UserException;
 import com.Api2.model.UserResponse;
 import com.Api2.repository.UserRepository;
 
-
-
-
 @Service
-public class UserServiceImpl implements UserService{
-	
+public class UserServiceImpl implements UserService {
+
 	@Autowired
 	private UserRepository repo;
-	
+
 //	private static List<Users> list=new ArrayList<>();
 //	static {
 //		Users u=new Users();
@@ -31,80 +28,60 @@ public class UserServiceImpl implements UserService{
 //			list.add(u);
 //				}
 
-	
 	@Override
-	public List<Users> getUsers(){
+	public List<Users> getUsers() {
 		return repo.findAll();
-				//return list;
+		// return list;
 	}
 
-
 	@Override
-	public Users saveUser(Users user) {
-		return repo.save(user);
-	}
-	
+	public UserResponse saveUser(Users user) {
+		try {
 
-//	//find an Employee
-//	@Override
-//	public Users getSingleUser (Long id) {
-//		// TODO Auto-generated method stub
-//		Optional<Users> optionalEmployee = repo.findById(id);
-//	return optionalEmployee.orElseThrow(()->
-//			//new EmployeeException("Employee Not Found","Invalid Employee ID, check "+id));
-//			new UserException("not fooound"));
-//	}
-	@Override
-	public Users getSingleUser (Long id) {
-		Optional<Users> user= repo.findById(id);
-		if(user.isPresent()) {
-			return user.get();
+			return this.getResponse(repo.save(user), "The user was saved");
+		} catch (Exception e) {
+
+			return this.getResponse(null, "Email id already Present");
+
 		}
-		throw new RuntimeException("Employee is not found for the id" +id);
-			
-		}
-//	@Override
-//	public Users  deleteUser (Long id) {
-//		return repo.deleteById(id);
-//		
-//	}
-	public void deleteUser(Long id) {
-		// return employeeRepository.deleteById(id).orElseThrow(());
-		repo.findById(id).orElseThrow(
-				//()-> new EmployeeException("Employee Not Found","Enter correct Employee ID "+id+ " is Invalid"));
-				()-> new UserException("noot here"));
-		repo.deleteById(id);
 	}
 
+	public UserResponse getSingleUser(Long id) {
+		Optional<Users> user = repo.findById(id);
+		if (user.isPresent()) {
+			return this.getResponse(user.get(), "User was found");
+		}
+		return this.getResponse(null, "User not found");
 
-	@Override
+	}
+
+	public UserResponse deleteUser(Long id) {
+		Optional<Users> user = repo.findById(id);
+		if (user.isPresent()) {
+			repo.deleteById(id);
+			return this.getResponse(null, "User was deleted");
+		}
+
+		return this.getResponse(null, "User was not found");
+	}
+
 	public UserResponse updateUser(Users user) {
-		Optional<Users> optUser=repo.findById(user.getId());
-		if(!optUser.isPresent())
-		{
-			return this.getResponse(null,"User not found");
+		Optional<Users> optUserById = repo.findById(user.getId());
+		if (optUserById.isEmpty()) {
+			return this.getResponse(null, "User not found");
 		}
-		Users userInDb = optUser.get();
-		System.out.println(userInDb.toString());
-		Optional<Users> optUserByEmail =repo.findByEmail(user.getEmail());
-		if(optUserByEmail.isEmpty() || user.getEmail().equals(optUserByEmail.get().getEmail()))
-		{
-			userInDb.setDob(user.getDob());
-			userInDb.setEmail(user.getEmail());
-			userInDb.setMobno(user.getMobno());
-			userInDb.setName(user.getName());
-			return this.getResponse( repo.save(userInDb),"User was updated");
+		try {
+			Users updatedUser = repo.save(user);
+			return this.getResponse(updatedUser, "User Updated");
+		} catch (Exception e) {
+			return this.getResponse(null, "Email id already present");
 		}
-		
-	
-		return this.getResponse( null,"Email already exist");
-		
-	}
 
+	}
 
 	private UserResponse getResponse(Users user, String message) {
-		
-		UserResponse response=new UserResponse();
+
+		UserResponse response = new UserResponse();
 		response.setUser(user);
 		response.setMessage(message);
 		return response;
@@ -117,5 +94,3 @@ public class UserServiceImpl implements UserService{
 
 //	}
 //}
-
-

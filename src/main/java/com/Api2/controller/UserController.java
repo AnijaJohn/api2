@@ -35,15 +35,14 @@ public class UserController {
 	}
 
 	@GetMapping("users/{id}")
-	public ResponseEntity<Users> getUser(@PathVariable Long id) {
-		Users user = service.getSingleUser(id);
-		return new ResponseEntity<Users>(user, HttpStatus.OK);
+	public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
+		return new ResponseEntity<UserResponse>(service.getSingleUser(id), HttpStatus.OK);
 	}
 
 	@PostMapping("/users")
-	public ResponseEntity<Users> save(@RequestBody UserRequest req) {
-		Users b = service.saveUser(this.requestToUserForSave(req));
-		return new ResponseEntity<Users>(b, HttpStatus.OK);
+	public ResponseEntity<UserResponse> save(@RequestBody UserRequest req) {
+
+		return new ResponseEntity<UserResponse>(service.saveUser(this.requestToUser(req)), HttpStatus.OK);
 	}
 
 	private Users requestToUserForSave(UserRequest req) {
@@ -73,9 +72,8 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-		service.deleteUser(id);
-		return new ResponseEntity<String>("Successfully deleted", HttpStatus.OK);
+	public ResponseEntity<UserResponse> deleteUser(@PathVariable Long id) {
+		return new ResponseEntity<UserResponse>(service.deleteUser(id), HttpStatus.OK);
 	}
 
 }
